@@ -15,7 +15,7 @@ def minOperations(n):
     """
     if not isinstance(n, int):
         return 0
-    
+
     op = 0
     i = 2
     while (i <= n):
