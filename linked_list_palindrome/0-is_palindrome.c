@@ -15,14 +15,14 @@ int recurPalindrome(listint_t **start, listint_t *end)
     int check;
 
     if (end == NULL)
-        return 1;  /* Base case: end of list */
+        return 1;
 
-    check = check_recursively(start, end->next);
+    check = recurPalindrome(start, end->next);
     if (check == 0)
-        return 0;  /* Early termination if mismatch found */
+        return 0; 
 
     check = ((*start)->n == end->n) ? 1 : 0;
-    *start = (*start)->next;  /* Advance start for next comparison */
+    *start = (*start)->next;
 
     return check;
 }
