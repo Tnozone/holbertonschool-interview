@@ -1,92 +1,108 @@
-#include <string.h>
+#include "holberton.h"
 #include <stdlib.h>
-#include <stdio.h>
-#include <ctype.h>
-/**
- * _isnumber - checks if string is number
- *
- * @s: string
- *
- * Return: 1 if number, 0 if not
- */
-int _isnumber(char *s)
-{
-	int i, check, d;
+#include <stddef.h>
+#include <string.h>
+#include <unistd.h>
 
-	d = 0, check = 1;
-	for (i = 0; *(s + i) != 0; i++)
+/**
+ * mul - multiplies two positive numbers
+ * @num1: the first number
+ * @num2: the second number
+ *
+ * Return: void (no return value)
+ */
+void mul(char *num1, char *num2)
+{
+	int len1, len2, i, j, carry;
+	int *result;
+
+	len1 = _strlen(num1);
+	len2 = _strlen(num2);
+
+	result = calloc(len1 + len2, sizeof(int));
+	if (result == NULL)
 	{
-		d = isdigit(*(s + i));
-		if (d == 0)
-		{
-			check = 0;
-			break;
-		}
+		write(STDERR_FILENO, "Error\n", 6);
+		exit(98);
 	}
-	return (check);
+
+	for (i = len1 - 1; i >= 0; i--)
+	{
+		carry = 0;
+		for (j = len2 - 1; j >= 0; j--)
+		{
+			int tmp = (num1[i] - '0') * (num2[j] - '0') + result[i + j + 1] + carry;
+
+			result[i + j + 1] = tmp % 10;
+			carry = tmp / 10;
+		}
+		result[i + j + 1] = carry;
+	}
+
+	i = 0;
+	while (i < len1 + len2 && result[i] == 0)
+		i++;
+
+	if (i == len1 + len2)
+		_putchar('0');
+	else
+		for (; i < len1 + len2; i++)
+			_putchar(result[i] + '0');
+	_putchar('\n');
+
+	free(result);
 }
 
 /**
- * _callocX - reserves memory initialized to 0
+ * _strlen - calculates the length of a string
+ * @str: the string to calculate the length of
  *
- * @nmemb: # of bytes
- *
- * Return: pointer
+ * Return: the length of the string
  */
-char *_callocX(unsigned int nmemb)
+int _strlen(char *str)
 {
-	unsigned int i;
-	char *p;
+	int count = 0;
 
-	p = malloc(nmemb + 1);
-	if (p == 0)
-		return (0);
-	for (i = 0; i < nmemb; i++)
-		p[i] = '0';
-	p[i] = '\0';
-	return (p);
+	while (*str)
+	{
+		count++;
+		str++;
+	}
+	return (count);
 }
 
 /**
- * main - multiplies inf numbers
+ * _isdigit - checks if a string contains only digits
+ * @str: the string to check
  *
- * @argc: # of cmd line args
- * @argv: cmd line args
- * Return: No return
+ * Return: 1 if all characters are digits, otherwise 0
+ */
+int _isdigit(char *str)
+{
+	while (*str)
+	{
+		if (*str < '0' || *str > '9')
+			return (0);
+		str++;
+	}
+	return (1);
+}
+
+/**
+ * main - Entry point for the program.
+ * @argc: The number of arguments passed to the program.
+ * @argv: An array of pointers to the arguments.
+ *
+ * Return: On success, returns 0.
  */
 int main(int argc, char **argv)
 {
-	int i, j, l1, l2, lful, mul, add, ten, ten2, tl, zer = 0;
-	char *res;
-
-	if (argc != 3 || _isnumber(argv[1]) == 0 || _isnumber(argv[2]) == 0)
-		printf("Error\n"), exit(98);
-	if (atoi(argv[1]) == 0 || atoi(argv[2]) == 0)
-		printf("0\n"), exit(0);
-	l1 = strlen(argv[1]), l2 = strlen(argv[2]);
-	lful = l1 + l2;
-	res = _callocX(lful);
-	if (res == 0)
-		printf("Error\n"), exit(98);
-	for (i = l2 - 1; i >= 0; i--)
+	if (argc != 3 || !_isdigit(argv[1]) || !_isdigit(argv[2]))
 	{
-		ten = 0, ten2 = 0;
-		for (j = l1 - 1; j >= 0; j--)
-		{
-			tl = i + j + 1;
-			mul = (argv[1][j] - '0') * (argv[2][i] - '0') + ten;
-			ten = mul / 10;
-			add = (res[tl] - '0') + (mul % 10) + ten2;
-			ten2 = add / 10;
-			res[tl] = (add % 10) + '0';
-		}
-		res[tl - 1] = (ten + ten2) + '0';
+		write(STDERR_FILENO, "Error\n", 6), exit(98);
 	}
-	if (res[0] == '0')
-		zer = 1;
-	for (; zer < lful; zer++)
-		printf("%c", res[zer]);
-	printf("\n");
-	free(res);
+
+	mul(argv[1], argv[2]);
+
 	return (0);
 }
